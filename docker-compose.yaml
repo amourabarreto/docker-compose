@@ -1,0 +1,46 @@
+version: "3.8"
+networks:
+  eureka-net:
+    driver: bridge
+services:
+  service-eureka:
+    image: amourabarreto/microservices:service-registry
+    networks:
+      eureka-net:
+    ports:
+      - "8761:8761"
+  service-gateway:
+    image: amourabarreto/microservices:service-gateway
+    networks:
+      - eureka-net
+    ports:
+      - '8080:8080'
+    environment:
+      URL-EUREKA-SERVER: http://service-eureka:8761/eureka
+    depends_on:
+      - service-eureka
+  postgres:
+    image: postgres
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: adm123
+    volumes:
+      - "c:/dev/volumes/postgres/data:/var/lib/postgresql/data"
+  rabbitmq:
+    image: rabbitmq:3.9-management
+    container_name: rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - "c:/Dev/volumes/rabbitmq/data:/var/lib/rabbitmq"
+  config-server:
+    image:  amourabarreto/microservices:config-server
+    container_name: config-server
+    ports:
+      - 8888:8888
+    environment:
+      USERNAME: amourabarreto
+      PASSWORD: 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
+      URI:  https://github.com/amourabarreto/ead-config-server-repo

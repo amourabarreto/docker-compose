@@ -5,12 +5,14 @@ networks:
 services:
   service-eureka:
     image: amourabarreto/microservices:service-registry
+    container_name: service-registry
     networks:
-      eureka-net:
+      - eureka-net
     ports:
       - "8761:8761"
   service-gateway:
     image: amourabarreto/microservices:service-gateway
+    container_name: service-gateway
     networks:
       - eureka-net
     ports:
@@ -38,9 +40,12 @@ services:
   config-server:
     image:  amourabarreto/microservices:config-server
     container_name: config-server
+    networks:
+      - eureka-net
     ports:
       - 8888:8888
     environment:
       USERNAME: amourabarreto
-      PASSWORD: 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
+      PASSWORD: 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
       URI:  https://github.com/amourabarreto/ead-config-server-repo
+      URL-EUREKA-SERVER: http://service-eureka:8761/eureka

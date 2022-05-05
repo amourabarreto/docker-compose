@@ -10,6 +10,9 @@ services:
       - eureka-net
     ports:
       - "8761:8761"
+    environment:
+      USERNAME: admin
+      PASSWORD: admin
   service-gateway:
     image: amourabarreto/microservices:service-gateway
     container_name: service-gateway
@@ -18,11 +21,34 @@ services:
     ports:
       - '8080:8080'
     environment:
-      URL-EUREKA-SERVER: http://service-eureka:8761/eureka
+      EUREKA-SERVER: service-eureka
+      USERNAME-EUREKA: admin
+      PASSWORD-EUREKA: admin
+      USERNAME-CONFIG-SERVER: admin
+      PASSWORD-CONFIG-SERVER: admin
+    depends_on:
+      - service-eureka
+  config-server:
+    image:  amourabarreto/microservices:config-server
+    container_name: config-server
+    networks:
+      - eureka-net
+    ports:
+      - 8888:8888
+    environment:
+      USERNAME: admin
+      PASSWORD: admin
+      USERNAME-GIT: amourabarreto
+      PASSWORD-GIT: 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
+      URI:  https://github.com/amourabarreto/ead-config-server-repo
+      EUREKA-SERVER: service-eureka
+      USERNAME-EUREKA: admin
+      PASSWORD-EUREKA: admin
     depends_on:
       - service-eureka
   postgres:
     image: postgres
+    container_name: postgres
     ports:
       - 5432:5432
     environment:
@@ -37,15 +63,3 @@ services:
       - 15672:15672
     volumes:
       - "c:/Dev/volumes/rabbitmq/data:/var/lib/rabbitmq"
-  config-server:
-    image:  amourabarreto/microservices:config-server
-    container_name: config-server
-    networks:
-      - eureka-net
-    ports:
-      - 8888:8888
-    environment:
-      USERNAME: amourabarreto
-      PASSWORD: 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
-      URI:  https://github.com/amourabarreto/ead-config-server-repo
-      URL-EUREKA-SERVER: http://service-eureka:8761/eureka

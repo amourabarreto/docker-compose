@@ -37,8 +37,6 @@ services:
   postgres:
     image: postgres
     container_name: postgres
-    networks:
-      - eureka-net
     ports:
       - 5432:5432
     environment:
@@ -69,17 +67,9 @@ services:
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
-      DB_VENDOR: POSTGRES
-      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
-      KC_DB_USERNAME: postgres
-      KC_DB_PASSWORD: adm123
-      KC_DB: postgres
     command:
       - start-dev
     ports:
       - "8180:8080"
-      - "8443:8443"
-    depends_on:
-      - postgres
     networks:
       - eureka-net

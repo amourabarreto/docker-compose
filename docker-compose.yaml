@@ -18,7 +18,7 @@ services:
     networks:
       - eureka-net
     ports:
-      - '8080:8080'
+      - "8080:8080"
     env_file:
       - service-gateway.env
     depends_on:
@@ -29,7 +29,7 @@ services:
     networks:
       - eureka-net
     ports:
-      - 8888:8888
+      - "8888:8888"
     env_file:
       - config-server.env
     depends_on:
@@ -37,8 +37,10 @@ services:
   postgres:
     image: postgres
     container_name: postgres
+    networks:
+      - eureka-net
     ports:
-      - 5432:5432
+      - "5432:5432"
     environment:
       POSTGRES_PASSWORD: adm123
     volumes:
@@ -47,8 +49,8 @@ services:
     image: rabbitmq:3.9-management
     container_name: rabbitmq
     ports:
-      - 5672:5672
-      - 15672:15672
+      - "5672:5672"
+      - "15672:15672"
     volumes:
       - "c:/Dev/volumes/rabbitmq/data:/var/lib/rabbitmq"
   filebeat:
@@ -62,14 +64,31 @@ services:
       - "C:/Dev/java/IdeaProjects/microservices/decoder/authuser/logs/ead-authuser-service.log:/var/log/ead-authuser/ead-authuser-service.log:ro"
     command: --strict.perms=false
   keycloak:
-    container_name: keycloak
-    image: quay.io/keycloak/keycloak:latest
+    build:
+      context: .
+      dockerfile: Dockerfile-keycloak
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
-    command:
-      - start-dev
+    depends_on:
+      - postgres
     ports:
-      - "8180:8080"
+      - "9090:8080"
+    container_name: keycloak_server_18
     networks:
       - eureka-net
+  wildfly:
+    image: quay.io/wildfly/wildfly:latest-jdk17
+    container_name: wildfly
+    volumes:
+      - "C:/Dev/volumes/wildfly:/opt/jboss/wildfly/standalone/deployments/:ro"
+    restart: always
+    command: >
+      bash -c "/opt/jboss/wildfly/bin/add-user.sh admin Admin#007 --silent
+      && /opt/jboss/wildfly/bin/standalone.sh -b 0.0.0.0 -bmanagement 0.0.0.0"
+    networks:
+      - eureka-net
+    ports:
+      - "8082:8080"
+      - "9992:9990"
+      - "8000:8000"

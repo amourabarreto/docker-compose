@@ -85,10 +85,10 @@ services:
     restart: always
     command: >
       bash -c "/opt/jboss/wildfly/bin/add-user.sh admin Admin#007 --silent
-      && /opt/jboss/wildfly/bin/standalone.sh -b 0.0.0.0 -bmanagement 0.0.0.0"
+      && /opt/jboss/wildfly/bin/standalone.sh -b 0.0.0.0 -bmanagement 0.0.0.0 --debug"
     networks:
       - eureka-net
     ports:
       - "8082:8080"
-      - "9992:9990"
-      - "8000:8000"
+      - "9990:9990"
+      - "8787:8787"
